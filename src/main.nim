@@ -14,13 +14,9 @@ proc ctrlcHandler {.noconv.} =
 
 proc main =
   echo "[autonim] initializing..."
-  setCurrentDir(getAppDir())
 
   initLock(lock)
-  initInputHook()
-  defer:
-    deinitLock(lock)
-    deinitInputHook()
+  setCurrentDir(getAppDir())
 
   setupIntrAuto()
   setupIntrMain()
@@ -29,6 +25,9 @@ proc main =
   let mainScript = scriptApiFile & readFile("./scripts/main.nims")
   let intr = initIntrMain(NimScriptFile mainScript)
   echo "[autonim] script loaded: \"./scripts/main.nims\""
+
+  # load automation scripts
+  loadAutomationScripts()
 
   # set mouse callback
   input.mouseEventCallback = proc(event: MouseEventData) =
@@ -43,6 +42,7 @@ proc main =
 
   # message loop
   # https://en.wikipedia.org/wiki/Message_loop_in_Microsoft_Windows
+  initInputHook()
   var msg: MSG
   while GetMessage(msg, 0, 0, 0) > 0:
     TranslateMessage(msg)

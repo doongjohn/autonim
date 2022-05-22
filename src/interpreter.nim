@@ -3,8 +3,6 @@ import std/options
 import std/tables
 import std/strutils
 import std/strformat
-import std/times
-import std/random
 import std/os
 import winim/lean as winlean
 import wAuto
@@ -25,30 +23,18 @@ proc setupIntrMain*()
 proc initIntrAuto(script: NimScriptFile | NimScriptPath): Option[Interpreter]
 proc initIntrMain*(script: NimScriptFile | NimScriptPath): Option[Interpreter]
 
+var automationIntr: Interpreter
+
 proc automation(scriptName: string) {.thread.} =
-  var intr {.threadvar.}: Interpreter
-
   {.cast(gcsafe).}:
-    once:
-      rng = initRand(getTime().toUnix * 1000000000 + getTime().nanosecond)
-
-      var combined = scriptApiFile
-      for k, v in usedScripts:
-        combined.add "var pp_{k}: proc() {{.nimcall.}}\n".fmt
-        combined.add "proc {k}* = pp_{k}()\n".fmt
-        combined.add "block:\n"
-        combined.add "  include \"{v}\"\n".fmt
-        combined.add "  pp_{k} = execute\n".fmt
-
-      # TODO: handle error
-      intr = initIntrAuto(NimScriptFile combined).get()
-
-    intr.invokeDynamic(scriptName)
+    automationIntr.invokeDynamic(scriptName)
     withLock lock:
       automationRunning = false
       automationExecute = false
 
 proc use(scriptName: string) =
+  # the program will load the specified script
+
   let scriptPath = "./scripts/{scriptName}.nims".fmt
 
   if scriptName == "main":
@@ -147,6 +133,18 @@ template commonExport(moduleName: untyped) =
 
 var addins_auto: VMAddins
 var addins_main: VMAddins
+
+proc loadAutomationScripts* =
+  var combined = scriptApiFile
+  for k, v in usedScripts:
+    combined.add "var pp_{k}: proc() {{.nimcall.}}\n".fmt
+    combined.add "proc {k}* = pp_{k}()\n".fmt
+    combined.add "block:\n"
+    combined.add "  include \"{v}\"\n".fmt
+    combined.add "  pp_{k} = execute\n".fmt
+
+  # TODO: handle error
+  automationIntr = initIntrAuto(NimScriptFile combined).get()
 
 proc setupIntrAuto* =
   commonExport(autonimAuto)

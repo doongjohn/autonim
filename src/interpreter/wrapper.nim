@@ -1,10 +1,11 @@
+import std/times
 import std/random
 import winim/lean
 import wAuto
 
 # init random state
 # this variable is only for the automation thread
-var rng* {.threadvar.}: Rand
+var rng* = initRand(getTime().toUnix * 1000000000 + getTime().nanosecond)
 
 proc randomInt*(min, max: int): int =
   # this function is only for the automation thread
