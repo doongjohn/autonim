@@ -5,12 +5,12 @@ proc onMouseEvent*(event: MouseEventData) =
   discard
 
 proc onKeyboardEvent*(event: KeyboardEventData) =
-  if event.keyState == WM_KEYUP and event.data.vkCode == Key_N:
+  if event.keyState == WM_KEYUP and event.keyCode == Key_N:
     if not isAutomationExecuting():
       echo "run"
       automationRun "hello"
 
-  if event.keyState == WM_KEYUP and event.data.vkCode == Key_F:
+  if event.keyState == WM_KEYUP and event.keyCode == Key_F:
     if isAutomationExecuting():
       automationStop()
     else:

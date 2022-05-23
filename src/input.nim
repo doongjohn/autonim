@@ -198,12 +198,13 @@ proc keyCodeToString*(keyCode: int): string =
 type
   # TODO: make user friendly api
   MouseEventData* = object
+    point: POINT
     mouseCode: WPARAM
-    data: MSLLHOOKSTRUCT
+    mouseData: DWORD
 
   KeyboardEventData* = object
     keyState: WPARAM
-    data: KBDLLHOOKSTRUCT
+    keyCode: DWORD
 
 var mouseHook: HHOOK
 var keyboardHook: HHOOK
@@ -212,9 +213,11 @@ var keyboardEventCallback*: proc(event: KeyboardEventData)
 
 proc mouseHookCb(code: int32, wParam: WPARAM, lParam: LPARAM): LRESULT {.stdcall.} =
   if lParam > 0:
+    var mouseStructPtr = cast[PMSLLHOOKSTRUCT](lParam)
     mouseEventCallback(MouseEventData(
+      point: mouseStructPtr[].pt,
       mouseCode: wParam,
-      data: (cast[PMSLLHOOKSTRUCT](lParam))[]
+      mouseData: mouseStructPtr[].mouseData,
     ))
   return CallNextHookEx(mouseHook, code, wParam, lParam)
 
@@ -222,11 +225,13 @@ proc keyboardHookCb(code: int32, wParam: WPARAM, lParam: LPARAM): LRESULT {.stdc
   if lParam > 0:
     keyboardEventCallback(KeyboardEventData(
       keyState: wParam,
-      data: (cast[PKBDLLHOOKSTRUCT](lParam))[]
+      keyCode: (cast[PKBDLLHOOKSTRUCT](lParam))[].vkCode
     ))
   return CallNextHookEx(keyboardHook, code, wParam, lParam)
 
 proc initInputHook* =
+  # NOTE: execute this code right before the message loop!
+  # otherwise your computer will lag
   mouseHook = SetWindowsHookExW(WH_MOUSE_LL, mouseHookCb, 0, 0)
   keyboardHook = SetWindowsHookExW(WH_KEYBOARD_LL, keyboardHookCb, 0, 0)
 
