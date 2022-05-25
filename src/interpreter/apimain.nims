@@ -38,7 +38,7 @@ proc onKeyboardEvent*(event: KeyboardEventData) =
 
     for e in eventKeyDown:
       if e.condition(event.keyCode):
-        if isAutomationExecuting():
+        if isScriptExecuting():
           e.onScriptRunning()
         else:
           e.onScriptInactive()
@@ -52,7 +52,7 @@ proc onKeyboardEvent*(event: KeyboardEventData) =
 
     for e in eventKeyUp:
       if e.condition(event.keyCode):
-        if isAutomationExecuting():
+        if isScriptExecuting():
           e.onScriptRunning()
         else:
           e.onScriptInactive()

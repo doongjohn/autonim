@@ -4,11 +4,11 @@ use "goodbye"
 onKeyUp do(keyCode: DWORD) -> bool:
   keyCode == Key_N
 do():
-  automationRun "hello"
+  scriptRun "hello"
 
 onKeyUp do(keyCode: DWORD) -> bool:
-  keyCode == Key_N
+  keyCode == Key_F
 do():
-  automationRun "goodbye"
+  scriptRun "goodbye"
 do():
-  automationStop()
+  scriptStop()

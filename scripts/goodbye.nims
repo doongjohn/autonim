@@ -1,7 +1,7 @@
 proc execute =
   echo "goodbye script"
   echo "loop start"
-  while isAutomationRunning():
+  while isScriptRunning():
     down()
     sleep(10)
     up()

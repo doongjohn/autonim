@@ -49,15 +49,15 @@ proc use(scriptName: string) =
   echo "[autonim] script loaded: \"{scriptPath}\"".fmt
   usedScripts[scriptName] = scriptPath
 
-proc isAutomationRunning: bool =
+proc isScriptRunning: bool =
   withLock lock:
     result = automationRunning
 
-proc isAutomationExecuting: bool =
+proc isScriptExecuting: bool =
   withLock lock:
     result = automationExecute
 
-proc automationRun(scriptName: string) =
+proc scriptRun(scriptName: string) =
   var running: bool
   withLock lock:
     running = automationRunning or automationExecute
@@ -77,7 +77,7 @@ proc automationRun(scriptName: string) =
   # start automation thread
   automationThread.createThread(automation, scriptName)
 
-proc automationStop =
+proc scriptStop =
   var running: bool
   withLock lock:
     running = automationRunning
@@ -154,7 +154,7 @@ proc setupIntrAuto* =
     autonimAuto,
     wrapper.randomInt,
     wrapper.randomFloat,
-    isAutomationRunning,
+    isScriptRunning,
   )
 
   addins_auto = implNimScriptModule(autonimAuto)
@@ -165,9 +165,9 @@ proc setupIntrMain* =
   exportTo(
     autonimMain,
     use,
-    isAutomationExecuting,
-    automationRun,
-    automationStop,
+    isScriptExecuting,
+    scriptRun,
+    scriptStop,
   )
 
   addCallable(autonimMain):
