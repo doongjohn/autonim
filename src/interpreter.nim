@@ -17,6 +17,7 @@ var automationExecute = false
 
 var usedScripts = initTable[string, string]()
 const scriptApiFile* = staticRead("./interpreter/api.nims") & '\n'
+const scriptApiFileMain* = staticRead("./interpreter/apimain.nims") & '\n'
 
 proc setupIntrAuto*()
 proc setupIntrMain*()

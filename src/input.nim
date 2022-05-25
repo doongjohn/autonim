@@ -1,3 +1,6 @@
+# references:
+# https://docs.microsoft.com/en-us/windows/win32/learnwin32/keyboard-input
+
 import std/tables
 import winim/lean
 import wAuto

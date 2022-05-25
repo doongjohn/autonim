@@ -22,7 +22,7 @@ proc main =
   setupIntrMain()
 
   # load main script
-  let mainScript = scriptApiFile & readFile("./scripts/main.nims")
+  let mainScript = scriptApiFile & scriptApiFileMain & readFile("./scripts/main.nims")
   let intr = initIntrMain(NimScriptFile mainScript)
   echo "[autonim] script loaded: \"./scripts/main.nims\""
 
