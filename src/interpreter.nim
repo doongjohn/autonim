@@ -113,6 +113,7 @@ template commonExport(moduleName: untyped) =
 
     # os
     sleep,
+    execShellCmd,
 
     # automation
     wrapper.an_optGet,
