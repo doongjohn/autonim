@@ -1,5 +1,5 @@
 use "hello"
-use "goodbye"
+use "fastclick"
 
 onKeyUp do(keyCode: DWORD, shift, ctrl, alt: bool) -> bool:
   keyCode == Key_N
@@ -7,8 +7,8 @@ do():
   scriptRun "hello"
 
 onKeyUp do(keyCode: DWORD, shift, ctrl, alt: bool) -> bool:
-  keyCode == Key_F
+  keyCode == Key_OemPeriod and ctrl
 do():
-  scriptRun "goodbye"
+  scriptRun "fastclick"
 do():
   scriptStop()
