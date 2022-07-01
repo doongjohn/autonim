@@ -7,7 +7,7 @@ windows automation with nimscript
 list of modules that are available for nimscript:\
 <https://nim-lang.org/docs/nims.html>
 
-<detail><summary>List of key codes</summary>
+<details><summary>List of key codes</summary>
 
 ```nim
 Key_Cancel = VK_CANCEL
@@ -213,4 +213,4 @@ Key_8 = ord '8'
 Key_9 = ord '9'
 ```
 
-</detail>
+</details>
