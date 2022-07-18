@@ -7,13 +7,12 @@ import wAuto
 # this variable is only for the automation thread
 var rng* = initRand(getTime().toUnix * 1000000000 + getTime().nanosecond)
 
+# this function is only for the automation thread
 proc randomInt*(min, max: int): int =
-  # this function is only for the automation thread
-  # ISSUE: can't pass generic type as an argument...?
   return rng.rand(min .. max)
 
+# this function is only for the automation thread
 proc randomFloat*(min, max: float): float =
-  # this function is only for the automation thread
   return rng.rand(min .. max)
 
 proc an_optGet*(key: string): int =

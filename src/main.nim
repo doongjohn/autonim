@@ -14,6 +14,7 @@ proc ctrlcHandler {.noconv.} =
 
 proc main =
   echo "[autonim] initializing..."
+  setControlCHook(ctrlcHandler)
 
   initLock(lock)
   setCurrentDir(getAppDir())
@@ -37,12 +38,11 @@ proc main =
   input.keyboardEventCallback = proc(event: KeyboardEventData) =
     intr.invoke(onKeyboardEvent, event)
 
-  setControlCHook(ctrlcHandler)
+  initInputHook()
   echo "[autonim] initialized!"
 
   # message loop
   # https://en.wikipedia.org/wiki/Message_loop_in_Microsoft_Windows
-  initInputHook()
   var msg: MSG
   while GetMessage(msg, 0, 0, 0) > 0:
     TranslateMessage(msg)
