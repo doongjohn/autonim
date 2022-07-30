@@ -2,26 +2,26 @@ proc onMouseEvent*(event: MouseEventData) =
   # TODO: make mouse event api
   discard
 
+type UserKeyboardEvent = tuple
+  condition: proc(keyCode: DWORD): bool
+  onScriptInactive: proc()
+  onScriptRunning: proc()
+
+var eventKeyDown = newSeq[UserKeyboardEvent]()
+var eventKeyUp = newSeq[UserKeyboardEvent]()
+
 var shift = false
 var ctrl = false
 var alt = false
 
-type UserEvent = tuple
-  condition: proc(keyCode: DWORD, shift, ctrl, alt: bool): bool
-  onScriptInactive: proc()
-  onScriptRunning: proc()
-
-var eventKeyDown = newSeq[UserEvent]()
-var eventKeyUp = newSeq[UserEvent]()
-
-proc onKeyDown(condition: proc(keyCode: DWORD, shift, ctrl, alt: bool): bool, onScriptInactive: proc(), onScriptRunning = proc() {.closure.} = discard) =
+proc onKeyDown(condition: proc(keyCode: DWORD): bool, onScriptInactive: proc(), onScriptRunning = proc() {.closure.} = discard) =
   eventKeyDown.add (
     condition,
     onScriptInactive,
     onScriptRunning
   )
 
-proc onKeyUp(condition: proc(keyCode: DWORD, shift, ctrl, alt: bool): bool, onScriptInactive: proc(), onScriptRunning = proc() {.closure.} = discard) =
+proc onKeyUp(condition: proc(keyCode: DWORD): bool, onScriptInactive: proc(), onScriptRunning = proc() {.closure.} = discard) =
   eventKeyUp.add (
     condition,
     onScriptInactive,
@@ -37,7 +37,7 @@ proc onKeyboardEvent*(event: KeyboardEventData) =
     else: discard
 
     for e in eventKeyDown:
-      if e.condition(event.keyCode, shift, ctrl, alt):
+      if e.condition(event.keyCode):
         if isScriptExecuting():
           e.onScriptRunning()
         else:
@@ -51,7 +51,7 @@ proc onKeyboardEvent*(event: KeyboardEventData) =
     else: discard
 
     for e in eventKeyUp:
-      if e.condition(event.keyCode, shift, ctrl, alt):
+      if e.condition(event.keyCode):
         if isScriptExecuting():
           e.onScriptRunning()
         else:

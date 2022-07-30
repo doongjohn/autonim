@@ -11,7 +11,7 @@ proc execute =
   let notepad = waitAny(window.className == "Notepad" and window.isActive)
 
   # Send some words
-  send("안녕, 세상{enter}")
+  send("안녕, 세상!{enter}")
 
   # Drag the mouse cursor to select
   clickDrag(pos1 = notepad.clientPosition(20, 120), pos2 = notepad.clientPosition(20, 100))
