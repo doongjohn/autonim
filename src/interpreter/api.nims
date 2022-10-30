@@ -396,6 +396,7 @@ const
   wDefault = int32.low.int
   wDefaultPoint: wPoint = (wDefault, wDefault)
 
+
 when declared(randomInt):
   proc random(minmax: Slice[int]): int =
     randomInt(minmax.a, minmax.b)
@@ -403,11 +404,14 @@ when declared(randomInt):
   proc random(minmax: Slice[float]): float =
     randomFloat(minmax.a, minmax.b)
 
+
 proc opt(key: string, value: int): int {.discardable.} =
   an_optSet(key, value)
 
+
 proc opt(key: string): int =
   an_optGet(key)
+
 
 proc clickDrag(
   button = mbLeft,
@@ -420,14 +424,18 @@ proc clickDrag(
     speed
   )
 
+
 proc process(window: Window): Process =
   getProcess(window)
+
 
 proc kill(process: Process): bool {.discardable.} =
   an_KillProc(process)
 
+
 proc kill(window: Window, byProcess = true) =
   an_KillWin(window, byProcess)
+
 
 # TODO: add timeout
 template waitAny(condition: untyped): Window =
@@ -444,14 +452,18 @@ template waitAny(condition: untyped): Window =
             break loop
     result
 
+
 proc className(window: Window): string =
   getClassName(window)
+
 
 proc clientPosition(window: Window, pos: wPoint = (0, 0)): wPoint =
   an_getClientPosition(window, pos)
 
+
 proc clientPosition(window: Window, x, y: int): wPoint =
   an_getClientPositionXY(window, x, y)
+
 
 proc send(
   text: string,

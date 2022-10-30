@@ -1,30 +1,34 @@
-import std/locks
-import std/options
-import std/tables
-import std/strutils
-import std/strformat
-import std/os
-import winim/lean as winlean
-import wAuto
-import input
-import interpreter/wrapper
-import nimscripter
+import
+  std/locks,
+  std/options,
+  std/tables,
+  std/strutils,
+  std/strformat,
+  std/os,
+  winim/lean as winlean,
+  wAuto,
+  input,
+  interpreter/wrapper,
+  nimscripter
 
-var lock*: Lock
-var automationThread: Thread[string]
-var automationRunning = false
-var automationExecute = false
+var
+  lock*: Lock
+  automationThread: Thread[string]
+  automationRunning = false
+  automationExecute = false
+  usedScripts = initTable[string, string]()
+  automationIntr: Interpreter
 
-var usedScripts = initTable[string, string]()
-const scriptApiFile* = staticRead("./interpreter/api.nims") & '\n'
-const scriptApiFileMain* = staticRead("./interpreter/apimain.nims") & '\n'
+const
+  scriptApiFile* = staticRead("./interpreter/api.nims") & '\n'
+  scriptApiFileMain* = staticRead("./interpreter/apimain.nims") & '\n'
+
 
 proc setupIntrAuto*()
 proc setupIntrMain*()
 proc initIntrAuto(script: NimScriptFile | NimScriptPath): Option[Interpreter]
 proc initIntrMain*(script: NimScriptFile | NimScriptPath): Option[Interpreter]
 
-var automationIntr: Interpreter
 
 proc automation(scriptName: string) {.thread.} =
   {.cast(gcsafe).}:
@@ -32,6 +36,7 @@ proc automation(scriptName: string) {.thread.} =
     withLock lock:
       automationRunning = false
       automationExecute = false
+
 
 proc use(scriptName: string) =
   # the program will load the specified script
@@ -49,13 +54,16 @@ proc use(scriptName: string) =
   echo "[autonim] script loaded: \"{scriptPath}\"".fmt
   usedScripts[scriptName] = scriptPath
 
+
 proc isScriptRunning: bool =
   withLock lock:
     result = automationRunning
 
+
 proc isScriptExecuting: bool =
   withLock lock:
     result = automationExecute
+
 
 proc scriptRun(scriptName: string) =
   var running: bool
@@ -77,6 +85,7 @@ proc scriptRun(scriptName: string) =
   # start automation thread
   automationThread.createThread(automation, scriptName)
 
+
 proc scriptStop =
   var running: bool
   withLock lock:
@@ -88,6 +97,7 @@ proc scriptStop =
     # NOTE: don't call thread.join here
     # because blocking the message loop is not a good idea
     # maybe make a sepreate thread for the message loop..?
+
 
 template commonExport(moduleName: untyped) =
   exportTo(
@@ -133,8 +143,11 @@ template commonExport(moduleName: untyped) =
     input.keyCodeToString,
   )
 
-var addins_auto: VMAddins
-var addins_main: VMAddins
+
+var
+  addinsAuto: VMAddins
+  addinsMain: VMAddins
+
 
 proc loadAutomationScripts* =
   var combined = scriptApiFile
@@ -148,6 +161,7 @@ proc loadAutomationScripts* =
   # TODO: handle error
   automationIntr = initIntrAuto(NimScriptFile combined).get()
 
+
 proc setupIntrAuto* =
   commonExport(autonimAuto)
 
@@ -158,7 +172,8 @@ proc setupIntrAuto* =
     isScriptRunning,
   )
 
-  addins_auto = implNimScriptModule(autonimAuto)
+  addinsAuto = implNimScriptModule(autonimAuto)
+
 
 proc setupIntrMain* =
   commonExport(autonimMain)
@@ -175,18 +190,20 @@ proc setupIntrMain* =
     proc onMouseEvent(event: MouseEventData)
     proc onKeyboardEvent(event: KeyboardEventData)
 
-  addins_main = implNimScriptModule(autonimMain)
+  addinsMain = implNimScriptModule(autonimMain)
+
 
 proc initIntrAuto(script: NimScriptFile | NimScriptPath): Option[Interpreter] =
   return loadScript(
     script = script,
-    addins = addins_auto,
+    addins = addinsAuto,
     stdPath = "./stdlib"
   )
+
 
 proc initIntrMain*(script: NimScriptFile | NimScriptPath): Option[Interpreter] =
   return loadScript(
     script = script,
-    addins = addins_main,
+    addins = addinsMain,
     stdPath = "./stdlib"
   )

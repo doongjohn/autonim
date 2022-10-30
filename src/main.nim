@@ -1,19 +1,22 @@
 # TODO: only include nimscript compatible modules
 # https://nim-lang.github.io/Nim/nims.html
 
-import std/options
-import std/locks
-import std/os
-import winim/lean
-import input
-import interpreter
-import nimscripter
+import
+  std/options,
+  std/locks,
+  std/os,
+  winim/lean,
+  input,
+  interpreter,
+  nimscripter
+
 
 proc ctrlcHandler {.noconv.} =
-  echo "[autonim] exit"
   deinitLock(lock)
   deinitInputHook()
+  echo "[autonim] exit"
   quit()
+
 
 proc messageLoop =
   # windows message loop
@@ -22,6 +25,7 @@ proc messageLoop =
   while GetMessage(msg, 0, 0, 0) > 0:
     TranslateMessage(msg)
     DispatchMessage(msg)
+
 
 proc main =
   echo "[autonim] initializing..."
@@ -52,6 +56,8 @@ proc main =
   initInputHook()
   echo "[autonim] initialized!"
 
+  # start message loop
   messageLoop()
+
 
 main()

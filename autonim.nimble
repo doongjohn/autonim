@@ -13,5 +13,5 @@ requires "winim"
 requires "wauto"
 requires "nimscripter"
 
-task mingw, "build it with mingw":
+task release, "release build":
   exec "nim c -d:mingw -d:release -o:autonim src/main.nim"

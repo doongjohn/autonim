@@ -1,9 +1,11 @@
 # references:
 # https://docs.microsoft.com/en-us/windows/win32/learnwin32/keyboard-input
 
-import std/tables
-import winim/lean
-import wAuto
+import
+  std/tables,
+  winim/lean,
+  wAuto
+
 
 # TODO: imporve the string representation
 const keyNameTable = {
@@ -195,8 +197,10 @@ const keyNameTable = {
   wKey_9: "9"
 }.toTable()
 
-proc keyCodeToString*(keyCode: int): string =
-  return keyNameTable[keyCode]
+
+template keyCodeToString*(keyCode: int): string =
+  keyNameTable[keyCode]
+
 
 type
   # TODO: make user friendly api
@@ -209,10 +213,13 @@ type
     keyState: WPARAM
     keyCode: DWORD
 
-var mouseHook: HHOOK
-var keyboardHook: HHOOK
-var mouseEventCallback*: proc(event: MouseEventData)
-var keyboardEventCallback*: proc(event: KeyboardEventData)
+
+var
+  mouseHook: HHOOK
+  keyboardHook: HHOOK
+  mouseEventCallback*: proc(event: MouseEventData)
+  keyboardEventCallback*: proc(event: KeyboardEventData)
+
 
 proc mouseHookCb(code: int32, wParam: WPARAM, lParam: LPARAM): LRESULT {.stdcall.} =
   if lParam > 0:
@@ -224,6 +231,7 @@ proc mouseHookCb(code: int32, wParam: WPARAM, lParam: LPARAM): LRESULT {.stdcall
     ))
   return CallNextHookEx(mouseHook, code, wParam, lParam)
 
+
 proc keyboardHookCb(code: int32, wParam: WPARAM, lParam: LPARAM): LRESULT {.stdcall.} =
   if lParam > 0:
     keyboardEventCallback(KeyboardEventData(
@@ -232,11 +240,13 @@ proc keyboardHookCb(code: int32, wParam: WPARAM, lParam: LPARAM): LRESULT {.stdc
     ))
   return CallNextHookEx(keyboardHook, code, wParam, lParam)
 
+
 proc initInputHook* =
   # NOTE: execute this code right before the message loop!
   # otherwise your computer will lag
   mouseHook = SetWindowsHookExW(WH_MOUSE_LL, mouseHookCb, 0, 0)
   keyboardHook = SetWindowsHookExW(WH_KEYBOARD_LL, keyboardHookCb, 0, 0)
+
 
 proc deinitInputHook* =
   UnhookWindowsHookEx(mouseHook)
